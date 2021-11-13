@@ -15,14 +15,14 @@ class Types:
     def validate(self, value, type):
         # First of all validate the any type (non empty)
         non_empty = self._any_parser(value)
-        if non_empty == False:
+        if not non_empty:
             raise ValueError("Please, enter a value")
 
         for parser in self.parsers:
             for key in parser.keys():
                 if key == type:
                     is_valid_or_exception = parser[key](value)
-                    if is_valid_or_exception != True:
+                    if not is_valid_or_exception:
                         raise ValueError(is_valid_or_exception)
 
     def add(self, type, parser_func):
@@ -31,7 +31,7 @@ class Types:
 
 
 def yn_parser(val):
-    if val == "y" or val == "n" or val == "yes" or val == "no":
+    if val.lower() in ['y', 'yes', 'n', 'no']:
         return True
     else:
         return ValueError(f"Value {val} is not assignable to type yes/no/y/n")
@@ -92,22 +92,23 @@ def get_random_fact(anime):
     return fun_fact
 
 
-def download_anime(fileName):
+def download_anime(file_name):
     print("\nDownloading anime image...")
     response = requests.get("https://api.waifu.pics/sfw/poke")
     url = response.json()["url"]
     image_response = requests.get(url)
 
     # create a file and subdirectory
-    if os.path.exists("assets") != True:
+    if not os.path.exists("assets"):
         os.mkdir("assets")
 
-    file = open("assets/" + fileName, "wb")
+    file = open("assets/" + file_name, "wb")
     file.write(image_response.content)
     file.close()
 
     print(
-        "Congrats! Your anime is waiting for you in the assets/anime.gif file!\nEnjoy and thanks for using AnimeWorld :)\n"
+        "Congrats! Your anime is waiting for you in the assets/anime.gif file!"
+        "\nEnjoy and thanks for using AnimeWorld :)\n"
     )
 
 
@@ -128,7 +129,7 @@ def init_app():
         config = {
             "name": name,
             "favorite": fav,
-            "sendImage": True if additional == "yes" or additional == "y" else False,
+            "sendImage": True if additional in ['yes', 'y'] else False,
         }
 
         with open(complete_name, "w+") as f:
