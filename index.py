@@ -6,13 +6,14 @@ import random
 
 # Defining utility class to later validate values and types of input data
 class Types:
-    def _any_parser(self, val):
-        return len(val) != 0
-
     def __init__(self):
         self.parsers = [{"any": self._any_parser}]
 
-    def validate(self, value, type):
+    @staticmethod
+    def _any_parser(val):
+        return len(val) != 0
+
+    def validate(self, value, type_):
         # First of all validate the any type (non empty)
         non_empty = self._any_parser(value)
         if not non_empty:
@@ -20,14 +21,14 @@ class Types:
 
         for parser in self.parsers:
             for key in parser.keys():
-                if key == type:
+                if key == type_:
                     is_valid_or_exception = parser[key](value)
                     if not is_valid_or_exception:
                         raise ValueError(is_valid_or_exception)
 
-    def add(self, type, parser_func):
+    def add(self, type_, parser_func):
         # parser function returns boolean whether or not the value was parsed successfully
-        self.parsers.append({type: parser_func})
+        self.parsers.append({type_: parser_func})
 
 
 def yn_parser(val):
@@ -61,14 +62,14 @@ types.add("anime", anime_parser)
 
 
 # Looping on the incorrect values
-def input_with_validation(query, type="any"):
+def input_with_validation(query, type_="any"):
     value = ""
     loop = True
 
     while loop:
         value = input(query)
         try:
-            types.validate(value, type)
+            types.validate(value, type_)
             loop = False
         except Exception as e:
             print(str(e))
@@ -156,7 +157,7 @@ def init_app():
         initial_config = open(complete_name, "r")
         parsed_config = json.loads(initial_config.read())
         start_work(parsed_config)
-    except Exception as e:
+    except ValueError:
         config = initialize_user()
         start_work(config)
 
