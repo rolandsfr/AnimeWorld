@@ -23,7 +23,7 @@ class Types:
             for key in parser.keys():
                 if key == type_:
                     is_valid_or_exception = parser[key](value)
-                    if not is_valid_or_exception:
+                    if is_valid_or_exception != True:
                         raise ValueError(is_valid_or_exception)
 
     def add(self, type_, parser_func):
@@ -42,7 +42,6 @@ def anime_parser(val):
     ALLOWED = [
         "naruto",
         "one piece",
-        "pokemon",
         "attack on titan",
     ]
 
@@ -121,6 +120,7 @@ def init_app():
         print(
             "Hello, Welcome to AnimeWorld!\nWe first need to gather some information before we can start."
         )
+
         name = input_with_validation("Whats your name? ")
         fav = input_with_validation("What is your favorite anime? ", "anime")
         additional = input_with_validation(
@@ -157,7 +157,7 @@ def init_app():
         initial_config = open(complete_name, "r")
         parsed_config = json.loads(initial_config.read())
         start_work(parsed_config)
-    except ValueError:
+    except Exception:
         config = initialize_user()
         start_work(config)
 
